@@ -1,6 +1,7 @@
 package TD1.Exercice2;
 
 import java.io.File;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class WC {
@@ -9,6 +10,8 @@ public class WC {
     public static void commandeWc(String filename) {
         try {
             Scanner scanner = new Scanner(new File(filename));
+
+            scanner.useLocale(Locale.US);
 
             int newLine = 0;
             int octets = 0;
