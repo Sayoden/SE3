@@ -12,6 +12,8 @@ public class CSV {
 
     private File csvFile;
 
+    private int maxCellule = 0;
+
     private final ArrayList<ArrayList<String>> lines = new ArrayList<>();
 
     public CSV(String fileName) {
@@ -19,7 +21,29 @@ public class CSV {
     }
 
     public ArrayList<String> decouperLigne(String s) {
-        return new ArrayList<>(Arrays.asList(s.split(",+")));
+        ArrayList<String> cells = new ArrayList<>();
+
+        StringBuilder token = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) == '"') {
+                i++;
+                do {
+                    token.append(s.charAt(i));
+                    i++;
+                } while (s.charAt(i) != '"');
+            } else {
+                if (s.charAt(i) == ',') {
+                    cells.add(token.toString());
+                    token = new StringBuilder();
+                } else {
+                    token.append(s.charAt(i));
+                }
+            }
+        }
+
+        cells.add(token.toString());
+
+        return cells;
     }
 
     public void lire() {
@@ -32,6 +56,12 @@ public class CSV {
             while (in.hasNextLine()) {
                 String nextLine = in.nextLine();
                 lines.add(decouperLigne(nextLine));
+            }
+
+            for (ArrayList<String> line : this.lines) {
+                if (this.maxCellule < line.size()) {
+                    this.maxCellule = line.size();
+                }
             }
 
             in.close();
@@ -52,8 +82,14 @@ public class CSV {
             PrintWriter out = new PrintWriter(nomFichier);
 
             for (ArrayList<String> line : this.lines) {
-                out.print(line);
+                for (String cell : line) {
+                    out.print(cell + ",");
+                }
+
+                out.println();
             }
+
+            out.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             System.exit(-1);
@@ -73,6 +109,8 @@ public class CSV {
         csv.lire();
 
         csv.afficher();
+
+        csv.ecrire("csv_out.csv");
     }
 
 }
