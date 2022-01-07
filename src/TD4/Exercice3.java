@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class Exercice3 {
 
-    public static final int[] tab = new int[100];
+    public static final int[] tab = new int[1003];
 
     static class Tableau extends Thread {
 
@@ -33,23 +33,33 @@ public class Exercice3 {
     public static void main(String[] args) {
         generate();
 
-        Tableau thread;
-        for (int i = 1; i <= 4; i++) {
-            int startAt;
-            if (i == 1) {
-                startAt = tab.length / i;
-            } else {
-                startAt = (tab.length / i) + tab.length / 4;
-            }²²QZS
-            thread = new Tableau(startAt - (tab.length / 4), startAt);
-            try {
-                thread.start();
-                thread.join();
-                System.out.println(thread.max);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        int nbThreads = 10;
+        int pas = tab.length / nbThreads;
+        int posAct = 0;
 
+        int reste = tab.length - (posAct + (pas * nbThreads));
+
+        System.out.println(reste);
+
+        for (int i = 0; i < nbThreads; i++) {
+            if (reste != 0) {
+                runThread(new Tableau(posAct, (posAct + pas) + reste));
+                posAct += pas + reste;
+                reste = 0;
+            } else {
+                runThread(new Tableau(posAct, posAct + pas));
+                posAct += pas;
+            }
+        }
+    }
+
+    public static void runThread(Tableau thread) {
+        try {
+            thread.start();
+            thread.join();
+            System.out.println(thread.max);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
